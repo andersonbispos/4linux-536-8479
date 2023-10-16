@@ -14,6 +14,7 @@ Seus recursos da AWS são provisionados automaticamente em uma VPC padrão pront
 
 - https://aws.amazon.com/certification/certified-sysops-admin-associate
 - https://aws.amazon.com/blogs/apn/amazon-vpc-for-on-premises-network-engineers-part-one/
+- https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html
 - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
 - https://health.aws.amazon.com/health/status
 - https://aws.amazon.com/pt/about-aws/global-infrastructure/localzones/features/
