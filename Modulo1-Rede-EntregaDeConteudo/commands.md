@@ -1,6 +1,5 @@
 ## Comandos pro lab de NACL
 
-
 1 - Virar root:
 
 ```sh
