@@ -1,0 +1,4 @@
+          us-east-2a | us-east-2b | us-east-2c
+public      pub1-2a  |  pub2-2b   |   pub3-2c  
+private     priv1-2a |  priv2-2b  |   priv3-2c
+banco       db1-2a   |  db2-2b    |   db3-2c

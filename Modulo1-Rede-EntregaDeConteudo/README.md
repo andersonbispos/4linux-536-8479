@@ -33,6 +33,7 @@ Seus recursos da AWS são provisionados automaticamente em uma VPC padrão pront
 - https://aws.amazon.com/directconnect/partners/
 - https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html
 - https://docs.aws.amazon.com/vpc/latest/peering/peering-configurations-full-access.html#three-vpcs-full-access
+- https://medium.com/awesome-cloud/aws-difference-between-vpc-peering-and-transit-gateway-comparison-aws-vpc-peering-vs-aws-transit-gateway-3640a464be2d
 - https://docs.aws.amazon.com/whitepapers/latest/aws-privatelink/what-are-vpc-endpoints.html
 
 ### Route 53
