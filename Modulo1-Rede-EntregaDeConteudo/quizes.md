@@ -17,3 +17,12 @@
 1. **Network ACL**
 1. VPC Flow Logs
 1. VPC endpoint
+
+**CHECKPOINT QUESTION**
+
+**Qual das opções a seguir pode ser usada para conectar sistemas em seu datacenter on-premisses a instâncias do EC2 que possuem apenas endereços IP privados? (Escolha 2)**
+
+1. VPN site a site
+1. SSH
+1. Direct Connect
+1. VPC Peering
