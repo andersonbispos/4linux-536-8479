@@ -14,6 +14,6 @@
 **Qual das opções a seguir pode negar explicitamente o acesso de um endereço IP específico a todas as instâncias do EC2 em sua sub-rede?**
 
 1. Security group
-1. Network ACL
+1. **Network ACL**
 1. VPC Flow Logs
 1. VPC endpoint
