@@ -52,4 +52,13 @@
 1. Route 53
 1. Site-to-Site VPN
 1. Direct Connect
-1. VPC peering
+1. **VPC peering**
+
+**CHECKPOINT QUESTION**
+
+**Qual dos seguintes serviços da AWS pode ser usado para fornecer uma conexão privada, que não usa a Internet, entre instâncias EC2 em seu VPC e seus buckets S3?**
+
+1. Direct Connect
+1. VPC Endpoint
+1. VPN
+1. NAT gateway
