@@ -26,3 +26,12 @@
 1. SSH
 1. Direct Connect
 1. VPC Peering
+
+**CHECKPOINT QUESTION**
+
+**Você criou uma nova VPC com o bloco CIDR de 10.0.0.0/16. Você cria 2 sub-redes: 10.0.1.0/24 e 10.0.2.0/24. 10.0.1.0 será uma sub-rede pública e 10.0.2.0 será uma sub-rede privada. Você implanta um gateway NAT com o nome i-7c1507ab em 10.0.1.0 e atribui a ele um endereço IP público. Agora você precisa atualizar sua tabela de rotas para concluir a configuração. Qual das opções a seguir é a listagem correta da tabela de rotas?**
+
+1. Destino: 10.0.0.0/16 Alvo:i-7c1507ab
+1. Destino: 10.0.2.0/24 Alvo:i-7c1507ab
+1. Destino: 10.0.1.0/24 Alvo:i-7c1507ab
+1. Destino: 0.0.0.0/0 Alvo:i-7c1507ab
