@@ -47,6 +47,8 @@ Seus recursos da AWS são provisionados automaticamente em uma VPC padrão pront
 - https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/ResourceRecordTypes.html
 - https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver.html
 - https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html
+- https://toolbox.googleapps.com/apps/dig/
+- 
 
 ### Cloud Front
 
