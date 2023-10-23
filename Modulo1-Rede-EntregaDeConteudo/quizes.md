@@ -34,4 +34,13 @@
 1. Destino: 10.0.0.0/16 Alvo:i-7c1507ab
 1. Destino: 10.0.2.0/24 Alvo:i-7c1507ab
 1. Destino: 10.0.1.0/24 Alvo:i-7c1507ab
-1. Destino: 0.0.0.0/0 Alvo:i-7c1507ab
+1. **Destino: 0.0.0.0/0 Alvo:i-7c1507ab**
+
+**CHECKPOINT QUESTION**
+
+**Qual dos seguintes serviços permite que você execute uma sessão interativa remota segura para instâncias Windows ou Linux EC2 usando PowerShell ou Bash?**
+
+1. Direct Connect
+1. Route 53
+1. Systems Manager Session Manager
+1. Site-to-Site VPN
