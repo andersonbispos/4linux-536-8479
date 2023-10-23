@@ -42,5 +42,14 @@
 
 1. Direct Connect
 1. Route 53
-1. Systems Manager Session Manager
+1. **Systems Manager Session Manager**
 1. Site-to-Site VPN
+
+**CHECKPOINT QUESTION**
+
+**Qual das opções a seguir permite que instâncias do EC2 em duas VPCs se comuniquem usando endereços IP privados?**
+
+1. Route 53
+1. Site-to-Site VPN
+1. Direct Connect
+1. VPC peering
