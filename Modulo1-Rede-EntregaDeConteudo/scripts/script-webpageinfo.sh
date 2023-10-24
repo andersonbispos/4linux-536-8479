@@ -1,5 +1,6 @@
 #!/bin/bash
 TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+SYSDATE=`date`
 
 sudo echo "<html><h1>Instance Data</h1><h3>Availability Zone: " > /var/www/html/index.html
 sudo curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/placement/availability-zone >> /var/www/html/index.html
