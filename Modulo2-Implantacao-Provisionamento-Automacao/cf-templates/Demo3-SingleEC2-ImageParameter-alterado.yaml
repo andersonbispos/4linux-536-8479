@@ -14,9 +14,9 @@ Parameters:
     Default: t3.micro
     AllowedValues:
       - t3.micro
-      - m1.small
-      - m1.large
-    Description: Enter t3.micro, m1.small, or m1.large. Default is t3.micro.
+      - t3.nano
+      - t3.small
+    Description: Enter t3.nano, t3.micro, or . Default is t3.micro.
 
 Resources:
 
