@@ -6,7 +6,7 @@ Parameters:
   ImageID:
     Description: Id of image
     Type: AWS::EC2::Image::Id
-    Default: ami-05fae4f24c18ca135
+    Default: ami-0dbc3d7bc646e8516
     ConstraintDescription: Provide the name of an existing AMI
 
   InstanceTypeParameter:
