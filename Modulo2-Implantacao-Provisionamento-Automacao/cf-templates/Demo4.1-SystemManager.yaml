@@ -39,7 +39,7 @@ Resources:
       VpcId: !Ref VPC1
       AvailabilityZone: !Select 
         - '0'
-        - !GetAZs us-east-1
+        - !GetAZs us-east-2
       MapPublicIpOnLaunch: 'true'
       CidrBlock: !FindInMap 
         - Subnet1Config
@@ -54,7 +54,7 @@ Resources:
       VpcId: !Ref VPC1
       AvailabilityZone: !Select 
         - '1'
-        - !GetAZs us-east-1
+        - !GetAZs us-east-2
       MapPublicIpOnLaunch: 'true'
       CidrBlock: !FindInMap 
         - Subnet1Config
