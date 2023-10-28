@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Template to create two EC2 instances for SSM
+
+Resources:
+  EC2CloudWatch1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t3.micro
+      ImageId: ami-02a89066c48741345
+      IamInstanceProfile: EC2DefaultRole-sysops
+      UserData: 
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash
+            yum install -y httpd rsyslog amazon-cloudwatch-agent
+            systemctl start httpd rsyslog
+            systemctl enable httpd rsyslog
+            sudo echo "<html><h1>Hello SysOps Admin</h1></html>" > /var/www/html/index.html
+      SecurityGroups:
+        - !Ref SSMSecurityGroup
+      Tags:
+        - Key: Name
+          Value: CWTeste1
+  SSMSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupName: SSMSecurityGroup
+      GroupDescription: Enable ICMP
+      SecurityGroupIngress:
+        IpProtocol: icmp
+        FromPort: -1
+        ToPort: -1
+        CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0

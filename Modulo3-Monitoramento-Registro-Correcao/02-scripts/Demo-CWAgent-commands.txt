@@ -1,0 +1,19 @@
+- Install CW agent
+yum install amazon-cloudwatch-agent 
+
+- Configure the CW agent:
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-config-wizard
+
+- Logfiles to send to cloudwatch
+/var/log/messages
+/var/log/httpd/access_log
+
+- View the CloudWatch agent config file:
+cd /opt/aws/amazon-cloudwatch-agent/bin
+cat config.json
+
+- Start the CloudWatch Agent:
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+
+- Stop the CloudWatch Agent:
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a stop
