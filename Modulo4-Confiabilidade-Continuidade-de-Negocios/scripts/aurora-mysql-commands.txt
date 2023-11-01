@@ -1,0 +1,17 @@
+mysql --version
+
+mysql -h auroralabcluster.cluster-c91ljibjnzxg.us-east-2.rds.amazonaws.com -u admin -p
+
+mysql -h auroralabcluster.cluster-ro-c91ljibjnzxg.us-east-2.rds.amazonaws.com -u admin -p
+
+show databases;
+
+create database testedb;
+
+use testedb;
+
+show tables;
+
+create table teste (name varchar(20));
+
+show global variables like 'aurora_server_id';
