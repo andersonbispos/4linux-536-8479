@@ -1,0 +1,205 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Template demo AWSConfig instance + ec2 + remediation
+
+Parameters:
+
+  DefaultAMI:
+    Description: Id of default compliance image
+    Type: AWS::EC2::Image::Id
+    Default: ami-05fae4f24c18ca135
+    ConstraintDescription: Provide the name of an existing AMI
+
+  UbuntuAMI:
+    Description: Id of non-compliance image 
+    Type: AWS::EC2::Image::Id
+    Default: ami-0e83be366243f524a
+    ConstraintDescription: Provide the name of an existing AMI
+
+Mappings:
+  Subnet1Config:
+    VPC1:
+      CIDR: 10.0.0.0/16
+    Public1:
+      CIDR: 10.0.0.0/24
+
+Resources:
+
+  VPC1:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      CidrBlock: !FindInMap
+        - Subnet1Config
+        - VPC1
+        - CIDR
+      Tags:
+        - Key: Name
+          Value: LAB_Config_SYSOPS_VPC
+
+  VPC1PublicSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC1
+      AvailabilityZone: !Select 
+        - '0'
+        - !GetAZs ""
+      MapPublicIpOnLaunch: 'true'
+      CidrBlock: !FindInMap 
+        - Subnet1Config
+        - Public1
+        - CIDR
+      Tags:
+        - Key: Name
+          Value: LAB_Config_SYSOPS_PUBLIC_1
+
+  InternetGateway1:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: LAB_SYSOPS_IGW
+  GatewayToInternet1:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref VPC1
+      InternetGatewayId: !Ref InternetGateway1
+
+  PublicRouteTable1:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC1
+      Tags:
+        - Key: Name
+          Value: LAB_Config_SYSOPS_PUBLIC_RT
+  PublicRoute1:
+    Type: 'AWS::EC2::Route'
+    DependsOn: GatewayToInternet1
+    Properties:
+      RouteTableId: !Ref PublicRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway1
+  PublicSubnet1RouteTableAssociation1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref VPC1PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable1
+
+  EC2Config1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t3.micro
+      ImageId: !Ref DefaultAMI
+      IamInstanceProfile: !Ref EC2DefaultInstanceProfile
+      NetworkInterfaces:
+        - GroupSet:
+            - !Ref SSMSecurityGroup
+          AssociatePublicIpAddress: 'true'
+          DeviceIndex: '0'
+          DeleteOnTermination: 'true'
+          SubnetId: !Ref VPC1PublicSubnet1
+      UserData: 
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash
+            yum install -y httpd
+            systemctl start httpd
+            systemctl enable httpd
+            sudo echo "<html><h1>Hello SysOps Admin</h1></html>" > /var/www/html/index.html
+      Tags:
+        - Key: Name
+          Value: EC2-AmazonLinux
+
+  # EC2Config2:
+  #   Type: 'AWS::EC2::Instance'
+  #   Properties:
+  #     InstanceType: t3.micro
+  #     ImageId: !Ref UbuntuAMI
+  #     IamInstanceProfile: !Ref EC2DefaultInstanceProfile
+  #     NetworkInterfaces:
+  #       - GroupSet:
+  #           - !Ref SSMSecurityGroup
+  #         AssociatePublicIpAddress: 'true'
+  #         DeviceIndex: '0'
+  #         DeleteOnTermination: 'true'
+  #         SubnetId: !Ref VPC1PublicSubnet1
+  #     Tags:
+  #       - Key: Name
+  #         Value: EC2-Ubuntu
+
+  SSMSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !Ref VPC1
+      GroupName: SSMSecurityGroup
+      GroupDescription: Enable ICMP
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+  
+  EC2DefaultInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+  EC2DefaultInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref EC2DefaultInstanceRole
+ 
+  ConfigAutomationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - ssm.amazonaws.com
+                - s3.amazonaws.com
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole
+  AutomationPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - iam:PassRole
+            Resource: 
+              - !GetAtt ConfigAutomationRole.Arn
+      PolicyName: AutomationPolicy
+      Roles:
+        - !Ref ConfigAutomationRole
+
+Outputs:
+
+  arnAutomationRole:
+    Description: Automation Role ARN
+    Value: !GetAtt ConfigAutomationRole.Arn
+    Description: ARN of automation role to use on remediation of ec2 instances
