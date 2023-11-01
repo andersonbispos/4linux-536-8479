@@ -59,6 +59,7 @@ Com o uso integrado dessas ferramentas, o SysOps Administrator pode garantir a e
 - https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-automation.html
 - https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-setup-iam.html
 - https://aws.amazon.com/config/faqs/
+- https://repost.aws/questions/QUbzk1cn5jTr6vSc3FyGBkPw/help-how-do-you-turn-off-aws-config
 
 ### VPC Logs
 
