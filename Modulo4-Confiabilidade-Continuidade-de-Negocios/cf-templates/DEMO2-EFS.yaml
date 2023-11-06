@@ -1,0 +1,223 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Template to create 3 public subnets + 2 vms
+
+Parameters:
+  ImageID:
+    Description: Id of image
+    Type: AWS::EC2::Image::Id
+    Default: ami-089c26792dcb1fbd4
+    ConstraintDescription: Provide the name of an existing AMI
+
+Mappings:
+  Subnet1Config:
+    VPC1:
+      CIDR: 10.0.0.0/16
+    Public1:
+      CIDR: 10.0.0.0/24
+    Public2:
+      CIDR: 10.0.1.0/24
+    Public3:
+      CIDR: 10.0.3.0/24
+
+Resources:
+
+  VPC1:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      CidrBlock: !FindInMap
+        - Subnet1Config
+        - VPC1
+        - CIDR
+      Tags:
+        - Key: Name
+          Value: LAB_EFS_SYSOPS_VPC
+
+  VPC1PublicSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC1
+      AvailabilityZone: !Select 
+        - '0'
+        - !GetAZs ""
+      MapPublicIpOnLaunch: 'true'
+      CidrBlock: !FindInMap 
+        - Subnet1Config
+        - Public1
+        - CIDR
+      Tags:
+        - Key: Name
+          Value: LAB_EFS_SYSOPS_PUBLIC_1
+
+  VPC1PublicSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC1
+      AvailabilityZone: !Select 
+        - '1'
+        - !GetAZs ""
+      MapPublicIpOnLaunch: 'true'
+      CidrBlock: !FindInMap 
+        - Subnet1Config
+        - Public2
+        - CIDR
+      Tags:
+        - Key: Name
+          Value: LAB_EFS_SYSOPS_PUBLIC_2
+
+  VPC1PublicSubnet3:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC1
+      AvailabilityZone: !Select 
+        - '2'
+        - !GetAZs ""
+      MapPublicIpOnLaunch: 'true'
+      CidrBlock: !FindInMap 
+        - Subnet1Config
+        - Public3
+        - CIDR
+      Tags:
+        - Key: Name
+          Value: LAB_EFS_SYSOPS_PUBLIC_3
+
+  InternetGateway1:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: LAB_SYSOPS_IGW
+  GatewayToInternet1:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref VPC1
+      InternetGatewayId: !Ref InternetGateway1
+  PublicRouteTable1:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC1
+      Tags:
+        - Key: Name
+          Value: LAB_SYSOPS_VPC
+  PublicRoute1:
+    Type: 'AWS::EC2::Route'
+    DependsOn: GatewayToInternet1
+    Properties:
+      RouteTableId: !Ref PublicRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway1
+  PublicSubnet1RouteTableAssociation1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref VPC1PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable1
+  PublicSubnet1RouteTableAssociation2:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref VPC1PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable1
+  PublicSubnet1RouteTableAssociation3:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref VPC1PublicSubnet3
+      RouteTableId: !Ref PublicRouteTable1
+
+  EFSClientSG:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: SG-EFS-Client
+      VpcId: !Ref VPC1
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: 22
+          ToPort: 22
+          IpProtocol: tcp
+      GroupName: LAB_EFS_SG_EFS-Client
+      Tags:
+        - Key: Name
+          Value: LAB_EFS_SG_EFS-Client
+
+  EFSServerSG:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: SG-EFS-Server
+      VpcId: !Ref VPC1
+      SecurityGroupIngress:
+        - SourceSecurityGroupId: !Ref EFSClientSG
+          FromPort: 2049
+          ToPort: 2049
+          IpProtocol: tcp
+      GroupName: LAB_EFS_SG_EFS-Server
+      Tags:
+        - Key: Name
+          Value: LAB_EFS_SG_EFS-Server
+
+  EC2DefaultInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+  EC2DefaultInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref EC2DefaultInstanceRole
+
+  WEBInstance1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !Ref ImageID
+      UserData: 
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash
+            sudo dnf install -y amazon-efs-utils
+            sudo mkdir /efs
+      IamInstanceProfile: !Ref EC2DefaultInstanceProfile
+      NetworkInterfaces:
+        - GroupSet:
+            - !Ref EFSClientSG
+          AssociatePublicIpAddress: 'true'
+          DeviceIndex: '0'
+          DeleteOnTermination: 'true'
+          SubnetId: !Ref VPC1PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: WEBInstance1
+
+  WEBInstance2:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !Ref ImageID
+      UserData: 
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash
+            sudo dnf install -y amazon-efs-utils
+            sudo mkdir /efs
+      IamInstanceProfile: !Ref EC2DefaultInstanceProfile
+      NetworkInterfaces:
+        - GroupSet:
+            - !Ref EFSClientSG
+          AssociatePublicIpAddress: 'true'
+          DeviceIndex: '0'
+          DeleteOnTermination: 'true'
+          SubnetId: !Ref VPC1PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: WEBInstance2
