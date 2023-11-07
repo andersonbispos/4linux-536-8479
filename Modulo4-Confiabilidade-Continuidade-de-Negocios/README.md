@@ -81,6 +81,9 @@ Ao dominar essas ferramentas, o profissional certificado AWS SysOps Administrato
 
 - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html#vol-type-ssd
 - https://aws.amazon.com/about-aws/whats-new/2020/12/introducing-new-amazon-ebs-general-purpose-volumes-gp3/
+- https://docs.aws.amazon.com/whitepapers/latest/tagging-best-practices/tagging-best-practices.html
+- https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/choosing-tags.html
+- https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html
 
 #### AWS Backup
 
