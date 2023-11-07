@@ -1,3 +1,7 @@
+sudo -i
+
+yum install -y mariadb
+
 mysql --version
 
 mysql -h auroralabcluster.cluster-c91ljibjnzxg.us-east-2.rds.amazonaws.com -u admin -p
